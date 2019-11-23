@@ -1,0 +1,30 @@
+{
+  "name": "info474-final",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "parcel index.html",
+    "deploy": "parcel build index.html --public-url https://etruong.github.io/info474-final && gh-pages -d dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/etruong/info474-final.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/etruong/info474-final/issues"
+  },
+  "homepage": "https://github.com/etruong/info474-final#readme",
+  "devDependencies": {
+    "gh-pages": "^2.1.1",
+    "parcel-bundler": "^1.12.4"
+  },
+  "dependencies": {
+    "@types/d3": "^5.7.2",
+    "@types/node": "^12.12.11",
+    "d3": "^5.14.2"
+  }
+}
