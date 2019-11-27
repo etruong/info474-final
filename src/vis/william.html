@@ -7,13 +7,22 @@
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
 	<title>INFO 474 Final Project - </title>
 	<style>
-		svg {
-			border: 1px solid red;
+		#william-tooltip {
+			position: absolute;
+			min-width: 505px;
+			min-height: 505px;
+			padding: 2.5px;
+			background: white;
+			border: 1px solid black;
+			box-shadow: 2px 2px 2px gray;
+			pointer-events: none;
+			z-index: 999;
 		}
 	</style>
 </head>
 
 <body>
+	<div id="william-tooltip"></div>
 	<div id="william-vis"></div>
 </body>
 <script src="./william.js"></script>
