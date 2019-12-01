@@ -1,6 +1,6 @@
-// import * as d3 from 'd3';
-// import dataCSV from '../../data/combine-hour-zip-code-data.csv';
-// import some from '../../../data/neighborhoods.json';
+import * as d3 from 'd3';
+import dataCSV from '../../data/combine-hour-zip-code-data.csv';
+import * as mapCoord from '../../data/neighborhoods.json';
 
 const DIV_CONTAINER_ID = "#elisa-vis";
 const WIDTH = 1000;
@@ -28,8 +28,8 @@ const neighborhoods = svg.append("g");
 let albersProjection = d3.geoAlbers()
     .scale(60000)
     .rotate([123, 0])
-    .center([0,500])
-    .translate([WIDTH /100 , HEIGHT * 11.7]);
+    .center([0, 500])
+    .translate([WIDTH / 100, HEIGHT * 11.7]);
 
 let geoPath = d3.geoPath()
     .projection(albersProjection)
@@ -52,12 +52,12 @@ svg.append("g")
     .data(rating)
     .enter()
     .append('circle')
-        .attr('cx', circleX + "px")
-        .attr('cy', (d, i) => {
-            return (circleY + (i * 20)) + "px";
-        })
-        .attr('r', "3px")
-        .attr('fill', (d) => { return COLOR_RATING[d]})
+    .attr('cx', circleX + "px")
+    .attr('cy', (d, i) => {
+        return (circleY + (i * 20)) + "px";
+    })
+    .attr('r', "3px")
+    .attr('fill', (d) => { return COLOR_RATING[d] })
 svg.append("g")
     .attr('x', "35px")
     .attr('y', "35px")
@@ -65,74 +65,72 @@ svg.append("g")
     .data(rating)
     .enter()
     .append('text')
-    .text((d) => {return d})
+    .text((d) => { return d })
     .attr('x', circleX + 10 + "px")
     .attr('y', (d, i) => {
         return (circleY + (i * 20)) + 5 + "px";
     })
     .attr('font-family', 'arial')
 
-d3.json('../../../data/neighborhoods.json', (mapCoord) => {
-    console.log(mapCoord)
-    neighborhoods.selectAll("path")
-        .data(mapCoord.features)
+neighborhoods.selectAll("path")
+    .data(mapCoord.features)
+    .enter()
+    .append("path")
+    .attr("fill", "#ccc")
+    .attr("stroke", "darkgrey")
+    .attr("d", geoPath)
+
+d3.csv(dataCSV, (data) => {
+    console.log(data);
+    data = data.filter((point) => {
+        return point["coordinates.latitude"] != "NA" || point["coordinates.longitude"] != "NA";
+    });
+    let pointData = data.map((point) => {
+        return {
+            "type": "Feature",
+            "properties": {
+                "info": point
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    parseFloat(point["coordinates.longitude"]),
+                    parseFloat(point["coordinates.latitude"])
+                ]
+            }
+        }
+    });
+
+    let div = d3.select("body").append("div")
+        .attr("class", "tooltip")
+        .style("opacity", 0);
+
+    let points = svg.append("g");
+    points.selectAll("path")
+        .data(pointData)
         .enter()
         .append("path")
-        .attr("fill", "#ccc")
-        .attr("stroke", "darkgrey")
-        .attr("d", geoPath)
-
-    d3.csv('../../../data/combine-hour-zip-code-data.csv', (data) => {
-        data = data.filter((point) => {
-            return point["coordinates.latitude"] != "NA" || point["coordinates.longitude"] != "NA";
-        });
-        let pointData = data.map((point) => {
-            return {
-                "type": "Feature",
-                "properties": {
-                    "info": point
-                },
-                "geometry": {
-                    "type": "Point",
-                    "coordinates": [
-                        parseFloat(point["coordinates.longitude"]),
-                        parseFloat(point["coordinates.latitude"])
-                    ]
-                }
-            }
-        });
-
-        let div = d3.select("body").append("div")	
-            .attr("class", "tooltip")				
-            .style("opacity", 0);
-
-        let points = svg.append("g");
-        points.selectAll("path")
-            .data(pointData)
-            .enter()
-            .append("path")
-            .attr('fill', (d) => {
-                return COLOR_RATING[d.properties.info.rating];
-            })
-            .attr('d', geoPath)
-            .on("mouseover", (d) => {
-                div.transition()
-                    .duration(200)
-                    .style("opacity", 1)
-                div	.html(d.properties.info.name + "<br />" + d.properties.info["location.address1"] +
+        .attr('fill', (d) => {
+            return COLOR_RATING[d.properties.info.rating];
+        })
+        .attr('d', geoPath)
+        .on("mouseover", (d) => {
+            div.transition()
+                .duration(200)
+                .style("opacity", 1)
+            div.html(d.properties.info.name + "<br />" + d.properties.info["location.address1"] +
                 "<br />" + d.properties.info["location.city"] + ", " + d.properties.info["location.state"] +
                 " " + d.properties.info["location.zip_code"] + "<br /> Rating: " + d.properties.info["rating"])
-                    .style("left", (d3.event.pageX) + "px")		
-                    .style("top", (d3.event.pageY - 5) + "px")
-                    .style("background-color", () => {
-                        return COLOR_RATING[d.properties.info.rating];
-                    })
-                    .style("opacity", 2);	
-            })
-            .on("mouseout", (d) => {
-                div.transition()
-                    .duration(200)
-                    .style("opacity", 0)
-            });;
-    });
+                .style("left", (d3.event.pageX) + "px")
+                .style("top", (d3.event.pageY - 5) + "px")
+                .style("background-color", () => {
+                    return COLOR_RATING[d.properties.info.rating];
+                })
+                .style("opacity", 2);
+        })
+        .on("mouseout", (d) => {
+            div.transition()
+                .duration(200)
+                .style("opacity", 0)
+        });;
 });
