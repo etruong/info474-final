@@ -71,8 +71,7 @@ svg.append("g")
         return (circleY + (i * 20)) + 5 + "px";
     })
     .attr('font-family', 'arial')
-
-neighborhoods.selectAll("path")
+    neighborhoods.selectAll("path")
     .data(mapCoord.features)
     .enter()
     .append("path")
@@ -80,30 +79,35 @@ neighborhoods.selectAll("path")
     .attr("stroke", "darkgrey")
     .attr("d", geoPath)
 
-d3.csv(dataCSV, (data) => {
-    console.log(data);
-    data = data.filter((point) => {
-        return point["coordinates.latitude"] != "NA" || point["coordinates.longitude"] != "NA";
-    });
-    let pointData = data.map((point) => {
-        return {
-            "type": "Feature",
-            "properties": {
-                "info": point
-            },
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    parseFloat(point["coordinates.longitude"]),
-                    parseFloat(point["coordinates.latitude"])
-                ]
+
+
+    const main = async () => {
+        const data = await d3.csv(dataCSV);
+        // console.log(data)
+
+        let filtered_data = data.filter((point) => {
+            return point["coordinates.latitude"] != "NA" || point["coordinates.longitude"] != "NA";
+        });
+
+        let pointData = filtered_data.map((point) => {
+            return {
+                "type": "Feature",
+                "properties": {
+                    "info": point
+                },
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [
+                        parseFloat(point["coordinates.longitude"]),
+                        parseFloat(point["coordinates.latitude"])
+                    ]
+                }
             }
-        }
-    });
+        })
 
     let div = d3.select("body").append("div")
-        .attr("class", "tooltip")
-        .style("opacity", 0);
+    .attr("class", "tooltip")
+    .style("opacity", 0);
 
     let points = svg.append("g");
     points.selectAll("path")
@@ -133,4 +137,86 @@ d3.csv(dataCSV, (data) => {
                 .duration(200)
                 .style("opacity", 0)
         });;
-});
+
+    }
+    main();      
+
+// let data = d3.csv(dataCSV)
+// console.log(data)
+// data = data.filter((point) => {
+//         return point["coordinates.latitude"] != "NA" || point["coordinates.longitude"] != "NA";
+//     });
+// let pointData = data.map((point) => {
+//     return {
+//         "type": "Feature",
+//         "properties": {
+//             "info": point
+//         },
+//         "geometry": {
+//             "type": "Point",
+//             "coordinates": [
+//                 parseFloat(point["coordinates.longitude"]),
+//                 parseFloat(point["coordinates.latitude"])
+//             ]
+//         }
+//     }
+// })
+// console.log(pointData)
+
+// d3.csv(dataCSV, (data) => {
+//     console.log(data);
+//     if (data["coordinates.latitude"] != "NA" || data["coordinates.longitude"] != "NA") {
+    
+//     // data = data.filter((point) => {
+//     //     return point["coordinates.latitude"] != "NA" || point["coordinates.longitude"] != "NA";
+//     // });
+//     let pointData = data.map((point) => {
+//         return {
+//             "type": "Feature",
+//             "properties": {
+//                 "info": point
+//             },
+//             "geometry": {
+//                 "type": "Point",
+//                 "coordinates": [
+//                     parseFloat(point["coordinates.longitude"]),
+//                     parseFloat(point["coordinates.latitude"])
+//                 ]
+//             }
+//         }
+//     });
+
+    // let div = d3.select("body").append("div")
+    //     .attr("class", "tooltip")
+    //     .style("opacity", 0);
+
+    // let points = svg.append("g");
+    // points.selectAll("path")
+    //     .data(pointData)
+    //     .enter()
+    //     .append("path")
+    //     .attr('fill', (d) => {
+    //         return COLOR_RATING[d.properties.info.rating];
+    //     })
+    //     .attr('d', geoPath)
+    //     .on("mouseover", (d) => {
+    //         div.transition()
+    //             .duration(200)
+    //             .style("opacity", 1)
+    //         div.html(d.properties.info.name + "<br />" + d.properties.info["location.address1"] +
+    //             "<br />" + d.properties.info["location.city"] + ", " + d.properties.info["location.state"] +
+    //             " " + d.properties.info["location.zip_code"] + "<br /> Rating: " + d.properties.info["rating"])
+    //             .style("left", (d3.event.pageX) + "px")
+    //             .style("top", (d3.event.pageY - 5) + "px")
+    //             .style("background-color", () => {
+    //                 return COLOR_RATING[d.properties.info.rating];
+    //             })
+    //             .style("opacity", 2);
+    //     })
+    //     .on("mouseout", (d) => {
+    //         div.transition()
+    //             .duration(200)
+    //             .style("opacity", 0)
+    //     });;
+    // }
+// });
